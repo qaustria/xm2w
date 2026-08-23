@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>XM2w</title>
+<link rel="stylesheet" href="style.css?v=1787515830" />
+</head>
+<body>
+<div class="app">
+  <div class="main">
+    <div class="stage"><span class="ver-badge">v6</span><span id="emu-badge" class="emu-badge hidden">EMULATOR</span>
+      <img id="product" src="imgs/topdown.png" alt="XM2w 4K" draggable="false" />
+    </div>
+
+    <div class="panel">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-page="sens">Sensitivity</button>
+        <button class="tab" data-page="assign">Assignments</button>
+      </div>
+
+      <!-- Sensitivity -->
+      <div class="page" id="page-sens">
+        <section class="group" id="group-levels">
+          <h2 data-title="DPI levels" data-tip="Four sensitivity levels. Press the DPI button on the bottom to cycle them — the LED color shows which is active.">DPI Levels</h2>
+          <div id="level-list" class="level-list"></div>
+        </section>
+
+        <section class="group" id="group-sensor">
+          <h2 data-title="Polling &amp; sensor" data-tip="How often the mouse reports position, how high it tracks off the surface, and motion-enhancing filters.">Polling &amp; Sensor</h2>
+          <div class="row">
+            <span class="row-label">Polling rate</span>
+            <div class="dd-wrap" id="rate-dd"></div>
+          </div>
+          <div class="row">
+            <span class="row-label">Lift-off distance</span>
+            <div class="dd-wrap" id="lod-dd"></div>
+          </div>
+          <div class="toggle-list" id="toggle-list"></div>
+        </section>
+      </div>
+
+      <!-- Assignments -->
+      <div class="page hidden" id="page-assign">
+        <section class="group" id="group-buttons">
+          <h2 data-title="Button assignments" data-tip="Remap what each physical button does — mouse clicks, keyboard keys, scrolling, or DPI cycling.">Button assignments</h2>
+          <div id="button-list" class="button-list"></div>
+        </section>
+      </div>
+
+      <div class="applybar">
+        <button class="btn primary" id="btn-apply" data-title="Apply" data-tip="Save all changes to the mouse. The mouse keeps them even after unplugging.">Apply</button>
+      </div>
+    </div>
+  </div>
+<footer class="footbar">
+    <div class="foot-left">
+      <img src="imgs/egg-logo.png" class="egg-logo" alt="Endgame Gear" draggable="false" />
+      <span class="foot-product">XM2w 4K</span>
+      <span class="foot-note">Not affiliated with Endgame Gear · trademarks belong to their owners</span>
+    </div>
+    <button class="gh-btn" id="btn-github" title="Source code on GitHub">
+      <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </button>
+  </footer>
+</div>
+<!-- key picker modal -->
+<div class="overlay hidden" id="kp-overlay">
+  <div class="kp">
+    <div class="kp-head">
+      <span class="kp-title">Choose a key</span>
+      <button class="kp-close" id="kp-close">✕</button>
+    </div>
+    <div class="kp-combo" id="kp-combo">—</div>
+    <div class="kp-mods" id="kp-mods"></div>
+    <div class="kp-keys" id="kp-keys"></div>
+    <div class="kp-capture">
+      <button class="btn" id="kp-capture-btn">…or press a key</button>
+    </div>
+    <div class="kp-foot">
+      <button class="btn" id="kp-cancel">Cancel</button>
+      <button class="btn primary" id="kp-ok">Done</button>
+    </div>
+  </div>
+
+</div>
+<script src="tip.js?v=1787515830"></script>
+<script src="app.js?v=1787515830"></script>
+<script src="kb_test2.js"></script>
+</body>
+</html>

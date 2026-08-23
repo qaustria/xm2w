@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"/></head>
+<body>
+<iframe id="f" src="/" style="width:1000px;height:800px;border:0"></iframe>
+<script>
+// can't reach into iframe cross-origin? same origin - ok
+setTimeout(() => {
+  const doc = document.getElementById("f").contentDocument;
+  const report = { viewport: { w: window.innerWidth, h: window.innerHeight } };
+  for (const id of ["btn-github", "btn-apply", "product", "kp-keys"]) {
+    const el = doc.getElementById(id);
+    if (el) {
+      const r = el.getBoundingClientRect();
+      report[id] = { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
+    } else report[id] = null;
+  }
+  const fb = doc.querySelector(".footbar");
+  if (fb) {
+    const r = fb.getBoundingClientRect();
+    const logo = doc.querySelector(".egg-logo");
+    const lr = logo ? logo.getBoundingClientRect() : null;
+    report.footbar = { y: Math.round(r.y), h: Math.round(r.height), logo: lr ? { w: Math.round(lr.width), h: Math.round(lr.height) } : null };
+  }
+  fetch("/api/log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report) });
+}, 3000);
+</script></body></html>
