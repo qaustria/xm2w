@@ -4,10 +4,16 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>XM2w</title>
-<link rel="stylesheet" href="style.css?v=1787664518" />
+<link rel="stylesheet" href="style.css?v=1787677880" />
 </head>
 <body>
 <div class="app">
+  <div id="perm-banner" class="perm-banner hidden">
+    <span class="perm-title">XM2w Control needs Input Monitoring access</span>
+    <span class="perm-text">Open System Settings → Privacy &amp; Security → Input Monitoring, then toggle <b>XM2w Control</b> off/on (or add it). The app can't reach your mouse until then.</span>
+    <button id="perm-open">Open Settings</button>
+    <button id="perm-retry">Reconnect</button>
+  </div>
   <div class="main">
     <div class="stage"><span class="ver-badge">v6</span><span id="emu-badge" class="emu-badge hidden">EMULATOR</span>
       <img id="product" src="imgs/topdown.png" alt="XM2w 4K" draggable="false" />
@@ -44,6 +50,11 @@
       <div class="page hidden" id="page-assign">
         <section class="group" id="group-buttons">
           <h2 data-title="Button assignments" data-tip="Remap what each physical button does — mouse clicks, keyboard keys, scrolling, or DPI cycling.">Button assignments</h2>
+          <div class="row" id="debounce-row">
+            <span class="btn-name" data-title="Click debounce"
+              data-tip="How long the mouse ignores a second click after the first. Lower = faster spam-clicking; higher = filters out accidental double-clicks.">Debounce</span>
+            <div class="dd-wrap" id="debounce-dd"></div>
+          </div>
           <div id="button-list" class="button-list"></div>
         </section>
       </div>
@@ -85,8 +96,8 @@
   </div>
 
 </div>
-<script src="tip.js?v=1787664518"></script>
-<script src="app.js?v=1787664518"></script>
+<script src="tip.js?v=1787677880"></script>
+<script src="app.js?v=1787677880"></script>
 <script src="kb_test2.js"></script>
 </body>
 </html>

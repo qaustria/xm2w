@@ -45,6 +45,7 @@ type IOHIDManagerCopyDevicesFn = unsafe extern "C" fn(IOHIDManagerRef) -> CFSetR
 type IOHIDDeviceGetPropertyFn = unsafe extern "C" fn(IOHIDDeviceRef, CFStringRef) -> *const c_void;
 type IOHIDDeviceOpenFn = unsafe extern "C" fn(IOHIDDeviceRef, u32) -> c_int;
 type IOHIDDeviceCloseFn = unsafe extern "C" fn(IOHIDDeviceRef, u32);
+type IOHIDRequestAccessFn = unsafe extern "C" fn(c_int) -> u8;
 type IOHIDDeviceSetReportFn = unsafe extern "C" fn(IOHIDDeviceRef, c_int, c_int, *const c_void, isize) -> c_int;
 type IOHIDDeviceGetReportFn = unsafe extern "C" fn(IOHIDDeviceRef, c_int, c_int, *mut c_void, *mut isize) -> c_int;
 
@@ -116,7 +117,13 @@ impl MacTransport {
             (fns.iohid_manager_set_matching)(mgr, match_dict);
             let mor = (fns.iohid_manager_open)(mgr, 0);
             if mor != 0 {
-                return Err(format!("IOHIDManagerOpen failed: 0x{:08x}", mor as u32));
+                // kIOReturnNotPermitted (0xe00002e2): Input Monitoring not granted.
+                // Ask for it so the user sees the system permission prompt instead
+                // of a silent failure (the grant is lost on every reinstall).
+                let req: IOHIDRequestAccessFn = dlsym("IOHIDRequestAccess");
+                let _ = req(0); // kIOHIDRequestTypeListenEvent
+                let _ = req(1); // kIOHIDRequestTypePostEvent
+                return Err(format!("IOHIDManagerOpen failed: 0x{:08x} (requested Input Monitoring — grant it in System Settings → Privacy & Security)", mor as u32));
             }
             let devs = (fns.iohid_manager_copy_devices)(mgr);
             if devs.is_null() {

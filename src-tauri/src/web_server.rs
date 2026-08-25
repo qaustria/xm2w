@@ -48,6 +48,12 @@ fn with_device<T: serde::Serialize>(f: impl FnOnce(&mut Device<Box<dyn Transport
 fn handle_api(method: &str, path: &str, body: &str) -> String {
     match (method, path) {
         ("GET", "/api/permissions") => crate::permissions::status().to_string(),
+        ("POST", "/api/open-settings") => {
+            let _ = std::process::Command::new("open")
+                .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")
+                .spawn();
+            "{\"ok\":true}".to_string()
+        }
         ("POST", "/api/permissions/request") => crate::permissions::request_all().to_string(),
         ("POST", "/api/emu") => {
             let on = body.contains("true");

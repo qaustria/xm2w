@@ -417,6 +417,22 @@ function simPress(slot) {
     .catch((e) => toast("simulate failed: " + e, "err"));
 }
 
+function renderDebounce() {
+  const wrap = document.getElementById("debounce-dd");
+  if (!wrap || !state.settings) return;
+  const cur = state.settings.buttons[1] ? state.settings.buttons[1].debounce : 8;
+  makeDropdown(wrap, [
+    { value: 0, label: "0 ms" },
+    { value: 2, label: "2 ms" },
+    { value: 4, label: "4 ms" },
+    { value: 8, label: "8 ms" },
+    { value: 16, label: "16 ms" },
+  ], cur, (v) => {
+    state.settings.buttons.forEach((b) => { b.debounce = v; });
+    setDirty();
+  });
+}
+
 function renderButtons() {
   const list = $("button-list");
   list.innerHTML = "";
@@ -565,9 +581,47 @@ function load() {
       renderLevels();
       renderToggles();
       renderButtons();
+      renderDebounce();
       setView("topdown");
     })
-    .catch((e) => { console.error(e); log("load FAILED: " + e); toast("Can't reach the mouse", "err"); });
+    .catch((e) => {
+      console.error(e); log("load FAILED: " + e); toast("Can't reach the mouse", "err");
+      const permIssue = String(e && e.error ? e.error : e).indexOf("0xe00002e2") >= 0
+        || String(e && e.error ? e.error : e).toLowerCase().indexOf("input monitoring") >= 0;
+      if (permIssue) showPermBanner();
+      // retry: grants like Input Monitoring can take effect seconds later
+      clearTimeout(load._retry);
+      load._retry = setTimeout(load, 2500);
+    });
+}
+
+function showPermBanner() {
+  const banner = document.getElementById("perm-banner");
+  if (banner) banner.classList.remove("hidden");
+}
+
+function hidePermBanner() {
+  const banner = document.getElementById("perm-banner");
+  if (banner) banner.classList.add("hidden");
+  try { localStorage.setItem("xm2w-perm-ok", "1"); } catch (e) {}
+}
+
+function setupPermBanner() {
+  const open = document.getElementById("perm-open");
+  const retry = document.getElementById("perm-retry");
+  if (open) open.addEventListener("click", () => {
+    fetch("/api/open-settings", { method: "POST" }).catch(() => {});
+  });
+  if (retry) retry.addEventListener("click", () => { hidePermBanner(); load(); });
+  // first launch: tell the user about Input Monitoring once
+  let seen = false;
+  try { seen = localStorage.getItem("xm2w-perm-ok") === "1"; } catch (e) {}
+  if (!seen) {
+    // only show if the device isn't already reachable (avoid nagging)
+    fetch("/api/info").then((r) => r.json()).then((d) => {
+      if (d.error) showPermBanner();
+    }).catch(() => showPermBanner());
+  }
 }
 
 function setDirty() {
@@ -587,6 +641,7 @@ function apply() {
       renderLevels();
       renderToggles();
       renderButtons();
+      renderDebounce();
       toast("Applied");
     })
     .catch((e) => { console.error(e); toast("Apply failed: " + e, "err"); });
@@ -594,6 +649,7 @@ function apply() {
 
 document.addEventListener("DOMContentLoaded", () => {
   log("UI LOADED v" + Date.now() + " keypicker=" + !!document.getElementById("kp-keys") + " footer=" + !!document.getElementById("btn-github"));
+  setupPermBanner();
   // static tooltips
   document.querySelectorAll("[data-tip]").forEach((el) => {
     bindTip(el, el.dataset.title, el.dataset.tip);

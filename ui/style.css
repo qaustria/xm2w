@@ -504,3 +504,21 @@ body {
   box-shadow: 0 0 12px rgba(252, 195, 20, 0.35);
   color: #fff;
 }
+
+/* ---------------- input monitoring banner ---------------- */
+.perm-banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px;
+  background: rgba(252, 195, 20, 0.1);
+  border-bottom: 1px solid rgba(252, 195, 20, 0.35);
+  font: 500 12.5px/1.45 var(--font); color: var(--text);
+}
+.perm-banner.hidden { display: none; }
+.perm-title { font-weight: 700; color: var(--accent); }
+.perm-banner button {
+  padding: 6px 14px; border-radius: 7px;
+  font: 600 12px/1 var(--font); color: #000;
+  background: var(--accent); border: none; cursor: pointer;
+}
+.perm-banner button:hover { background: var(--accent-2); }
+.perm-banner button.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border-2); }
