@@ -114,8 +114,9 @@ impl MacTransport {
             (fns.cf_dict_set_value)(match_dict, cfstr(&fns, "VendorID"), cfnum(&fns, 0x3367));
             (fns.cf_dict_set_value)(match_dict, cfstr(&fns, "ProductID"), cfnum(&fns, pid as i32));
             (fns.iohid_manager_set_matching)(mgr, match_dict);
-            if (fns.iohid_manager_open)(mgr, 0) != 0 {
-                return Err("IOHIDManagerOpen failed".into());
+            let mor = (fns.iohid_manager_open)(mgr, 0);
+            if mor != 0 {
+                return Err(format!("IOHIDManagerOpen failed: 0x{:08x}", mor as u32));
             }
             let devs = (fns.iohid_manager_copy_devices)(mgr);
             if devs.is_null() {

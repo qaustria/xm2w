@@ -1,7 +1,18 @@
+mod permissions;
 mod web_server;
 pub mod xm2w;
 
 use tauri::{WebviewUrl, WebviewWindowBuilder};
+
+#[tauri::command]
+fn cmd_permissions_status() -> serde_json::Value {
+    permissions::status()
+}
+
+#[tauri::command]
+fn cmd_request_permissions() -> serde_json::Value {
+    permissions::request_all()
+}
 
 pub fn run() {
     // --silent: run the server only, no window (headless CLI mode)
@@ -12,6 +23,7 @@ pub fn run() {
     }
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {}))
+        .invoke_handler(tauri::generate_handler![cmd_permissions_status, cmd_request_permissions])
         .setup(move |app| {
             // start embedded web server on a random port
             let port = web_server::start(0).map_err(|e| e.to_string())?;

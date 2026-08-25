@@ -47,6 +47,8 @@ fn with_device<T: serde::Serialize>(f: impl FnOnce(&mut Device<Box<dyn Transport
 
 fn handle_api(method: &str, path: &str, body: &str) -> String {
     match (method, path) {
+        ("GET", "/api/permissions") => crate::permissions::status().to_string(),
+        ("POST", "/api/permissions/request") => crate::permissions::request_all().to_string(),
         ("POST", "/api/emu") => {
             let on = body.contains("true");
             crate::xm2w::emu::emu_set(on);

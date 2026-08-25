@@ -3,6 +3,7 @@ name = "xm2w"
 version = "0.1.0"
 description = "Endgame Gear XM2w 4K configurator"
 edition = "2021"
+default-run = "xm2w"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
