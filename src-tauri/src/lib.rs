@@ -41,4 +41,6 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error building tauri app");
     app.run(|_handle, _event| {});
+    // release the seized mouse interface on exit
+    xm2w::driftguard::stop();
 }

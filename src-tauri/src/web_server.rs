@@ -49,10 +49,49 @@ fn handle_api(method: &str, path: &str, body: &str) -> String {
     match (method, path) {
         ("GET", "/api/permissions") => crate::permissions::status().to_string(),
         ("POST", "/api/open-settings") => {
+            // body: {"pane":"input"|"accessibility"} — default input
+            let pane = if body.contains("accessibility") { "Privacy_Accessibility" } else { "Privacy_ListenEvent" };
             let _ = std::process::Command::new("open")
-                .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")
+                .arg(format!("x-apple.systempreferences:com.apple.preference.security?{pane}"))
                 .spawn();
             "{\"ok\":true}".to_string()
+        }
+        ("GET", "/api/guard") => serde_json::json!({
+            "active": crate::xm2w::driftguard::is_active(),
+            "deadzone": crate::xm2w::driftguard::deadzone(),
+            "accessibility": crate::permissions::check_accessibility(),
+        })
+        .to_string(),
+        ("POST", "/api/guard") => {
+            #[derive(serde::Deserialize)]
+            struct GuardReq {
+                active: Option<bool>,
+                deadzone: Option<i16>,
+            }
+            match serde_json::from_str::<GuardReq>(body) {
+                Err(e) => format!("{{\"error\":\"bad json: {e}\"}}"),
+                Ok(req) => {
+                    if let Some(dz) = req.deadzone {
+                        crate::xm2w::driftguard::set_deadzone(dz);
+                    }
+                    let result = match req.active {
+                        Some(true) => crate::xm2w::driftguard::start(),
+                        Some(false) => {
+                            crate::xm2w::driftguard::stop();
+                            Ok(())
+                        }
+                        None => Ok(()),
+                    };
+                    match result {
+                        Ok(()) => serde_json::json!({
+                            "active": crate::xm2w::driftguard::is_active(),
+                            "deadzone": crate::xm2w::driftguard::deadzone(),
+                        })
+                        .to_string(),
+                        Err(e) => format!("{{\"error\":\"{e}\"}}"),
+                    }
+                }
+            }
         }
         ("POST", "/api/permissions/request") => crate::permissions::request_all().to_string(),
         ("POST", "/api/emu") => {
