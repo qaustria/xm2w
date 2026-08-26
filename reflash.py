@@ -114,9 +114,14 @@ def main():
     except Exception as e:
         print(f"config backup failed (continuing anyway): {e}")
 
-    # 1) enter bootloader: [0xA0][0x00 x1040] on the app device
+    # 1) enter bootloader: [A0][3A] magic handshake, then [A0][0x00 x1040]
     try:
         with XM2wTransport(pid=PID_APP).open() as t:
+            magic = bytes([0x3A, 0x00, 0x00, 0x00, 0x5A, 0xA5, 0x32]) + b"\x00" * 1033
+            t.set_feature(0xA0, magic)
+            time.sleep(0.15)
+            r = t.get_feature(0xA0, 1041)
+            print(f"A0/3A magic resp: {r[:16].hex()}")
             t.set_feature(0xA0, b"\x00" * 1040)
             print("enter-bootloader sent ([0xA0][0x00 x1040])")
     except Exception as e:

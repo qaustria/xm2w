@@ -65,24 +65,13 @@ mod imp {
     }
 
     /// Request Accessibility trust with the system prompt.
+    ///
+    /// NOTE: we deliberately do NOT call AXIsProcessTrustedWithOptions with
+    /// kAXTrustedCheckOptionPrompt — passing a CFString where the API expects
+    /// a CFBoolean segfaults the process. The UI banner + Open Settings
+    /// button (Privacy_Accessibility) guide the user instead.
     pub fn request_accessibility() -> bool {
-        unsafe {
-            let cf_str: CFStringCreateWithCStringFn = dlsym("CFStringCreateWithCString");
-            let cf_dict: CFDictionaryCreateMutableFn = dlsym("CFDictionaryCreateMutable");
-            let cf_set: CFDictionarySetValueFn = dlsym("CFDictionarySetValue");
-            let cf_release: CFReleaseFn = dlsym("CFRelease");
-
-            let key = cf_str(std::ptr::null(), c"AXTrustedCheckOptionPrompt".as_ptr(), 0x08000100);
-            let val = cf_str(std::ptr::null(), c"true".as_ptr(), 0x08000100);
-            let opts = cf_dict(std::ptr::null(), 1, std::ptr::null(), std::ptr::null());
-            cf_set(opts, key, val);
-            let f: AXIsProcessTrustedWithOptionsFn = dlsym("AXIsProcessTrustedWithOptions");
-            let granted = f(opts) != 0;
-            cf_release(opts);
-            cf_release(key);
-            cf_release(val);
-            granted || check_accessibility()
-        }
+        check_accessibility()
     }
 }
 
